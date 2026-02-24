@@ -62,6 +62,7 @@ const Dashboard = {
       pedidos_proveedores: 'bg-blue-500',
       utiles: 'bg-purple-500',
       medicamentos: 'bg-pink-500',
+      consumo: 'bg-orange-500',
       otros: 'bg-gray-500',
     };
 

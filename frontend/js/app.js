@@ -31,6 +31,7 @@ function getCategoryLabel(cat) {
     pedidos_proveedores: 'Proveedores',
     utiles: 'Útiles',
     medicamentos: 'Medicamentos',
+    consumo: 'Consumo',
     otros: 'Otros',
   };
   return labels[cat] || cat;
@@ -41,6 +42,7 @@ function getCategoryBadgeClass(cat) {
     pedidos_proveedores: 'badge-proveedores',
     utiles: 'badge-utiles',
     medicamentos: 'badge-medicamentos',
+    consumo: 'badge-consumo',
     otros: 'badge-otros',
   };
   return classes[cat] || 'badge-otros';

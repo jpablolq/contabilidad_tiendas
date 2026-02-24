@@ -88,6 +88,7 @@ const Gastos = {
             <option value="pedidos_proveedores" ${gas?.categoria === 'pedidos_proveedores' ? 'selected' : ''}>Pedidos a Proveedores</option>
             <option value="utiles" ${gas?.categoria === 'utiles' ? 'selected' : ''}>Compra de Útiles</option>
             <option value="medicamentos" ${gas?.categoria === 'medicamentos' ? 'selected' : ''}>Medicamentos</option>
+            <option value="consumo" ${gas?.categoria === 'consumo' ? 'selected' : ''}>Consumo</option>
             <option value="otros" ${!gas || gas.categoria === 'otros' ? 'selected' : ''}>Otros</option>
           </select>
         </div>

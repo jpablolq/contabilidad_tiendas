@@ -3,8 +3,7 @@ Modelo de Gastos.
 Categorías:
   - pedidos_proveedores: Pedidos a proveedores
   - utiles: Compra de útiles
-  - medicamentos: Compra de medicamentos
-  - otros: Otros gastos
+  - medicamentos: Compra de medicamentos  - consumo: Gastos de consumo  - otros: Otros gastos
 """
 from sqlalchemy import Column, Integer, Float, String, Date, DateTime, Enum as SQLEnum
 from sqlalchemy.sql import func
@@ -16,6 +15,7 @@ class ExpenseCategory(str, enum.Enum):
     PEDIDOS_PROVEEDORES = "pedidos_proveedores"
     UTILES = "utiles"
     MEDICAMENTOS = "medicamentos"
+    CONSUMO = "consumo"
     OTROS = "otros"
 
 

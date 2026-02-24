@@ -72,6 +72,7 @@
 .badge-proveedores { @apply bg-blue-100 text-blue-800; }
 .badge-utiles { @apply bg-purple-100 text-purple-800; }
 .badge-medicamentos { @apply bg-pink-100 text-pink-800; }
+.badge-consumo { @apply bg-orange-100 text-orange-800; }
 .badge-otros { @apply bg-gray-100 text-gray-800; }
 
 /* ── Status badges ── */
