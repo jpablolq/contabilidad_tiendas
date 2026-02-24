@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Software Contable</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a' },
+            sidebar: '#1e293b',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+  <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen bg-sidebar text-white transition-transform -translate-x-full lg:translate-x-0">
+    <div class="h-full flex flex-col">
+      <!-- Logo -->
+      <div class="px-5 py-6 border-b border-gray-700">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
+            <i class="fas fa-calculator text-xl"></i>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold">Contabilidad</h1>
+            <p class="text-xs text-gray-400">Sistema de gestión</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <a href="#" data-page="dashboard" class="nav-link active flex items-center gap-3 px-4 py-3 rounded-lg transition-colors">
+          <i class="fas fa-chart-pie w-5 text-center"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" data-page="ingresos" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors">
+          <i class="fas fa-arrow-trend-up w-5 text-center text-green-400"></i>
+          <span>Ingresos</span>
+        </a>
+        <a href="#" data-page="gastos" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors">
+          <i class="fas fa-arrow-trend-down w-5 text-center text-red-400"></i>
+          <span>Gastos</span>
+        </a>
+        <a href="#" data-page="pedidos" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors">
+          <i class="fas fa-truck w-5 text-center text-yellow-400"></i>
+          <span>Pedidos Pendientes</span>
+          <span id="badge-pedidos" class="hidden ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+        </a>
+        <a href="#" data-page="reportes" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors">
+          <i class="fas fa-file-excel w-5 text-center text-emerald-400"></i>
+          <span>Reportes y Exportar</span>
+        </a>
+      </nav>
+
+      <!-- Footer -->
+      <div class="px-5 py-4 border-t border-gray-700 text-xs text-gray-500">
+        <p>v1.0.0 &bull; Software Contable</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+  <div class="lg:ml-64 min-h-screen flex flex-col">
+    <!-- Top bar -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-30">
+      <div class="flex items-center justify-between px-4 py-3 lg:px-6">
+        <div class="flex items-center gap-3">
+          <button id="btn-sidebar-toggle" class="lg:hidden text-gray-600 hover:text-gray-900">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <h2 id="page-title" class="text-xl font-semibold text-gray-800">Dashboard</h2>
+        </div>
+        <div class="flex items-center gap-4">
+          <span id="fecha-actual" class="text-sm text-gray-500"></span>
+          <button id="btn-notificaciones" class="relative text-gray-600 hover:text-primary-600 transition-colors" title="Notificaciones">
+            <i class="fas fa-bell text-xl"></i>
+            <span id="badge-notif" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content area -->
+    <main class="flex-1 p-4 lg:p-6">
+
+      <!-- ══════ DASHBOARD ══════ -->
+      <section id="page-dashboard" class="page-section">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-white rounded-xl shadow-sm border p-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-500">Ingresos Hoy</p>
+                <p id="dash-ingresos" class="text-2xl font-bold text-green-600 mt-1">$0</p>
+              </div>
+              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-arrow-trend-up text-green-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm border p-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-500">Gastos Hoy</p>
+                <p id="dash-gastos" class="text-2xl font-bold text-red-600 mt-1">$0</p>
+              </div>
+              <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-arrow-trend-down text-red-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm border p-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-500">Balance Hoy</p>
+                <p id="dash-balance" class="text-2xl font-bold text-primary-600 mt-1">$0</p>
+              </div>
+              <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-scale-balanced text-primary-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gastos por categoría -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          <div class="bg-white rounded-xl shadow-sm border p-5">
+            <h3 class="font-semibold text-gray-700 mb-4"><i class="fas fa-tags mr-2"></i>Gastos por Categoría (Hoy)</h3>
+            <div id="dash-categorias" class="space-y-3">
+              <p class="text-gray-400 text-sm">Sin datos</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm border p-5">
+            <h3 class="font-semibold text-gray-700 mb-4"><i class="fas fa-truck mr-2"></i>Pedidos Pendientes</h3>
+            <div id="dash-pedidos-pendientes" class="space-y-3">
+              <p class="text-gray-400 text-sm">Sin pedidos pendientes</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen mensual -->
+        <div class="bg-white rounded-xl shadow-sm border p-5">
+          <h3 class="font-semibold text-gray-700 mb-4"><i class="fas fa-calendar-days mr-2"></i>Resumen del Mes</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="text-center p-3 bg-green-50 rounded-lg">
+              <p class="text-sm text-gray-500">Ingresos del Mes</p>
+              <p id="dash-mes-ingresos" class="text-xl font-bold text-green-600">$0</p>
+            </div>
+            <div class="text-center p-3 bg-red-50 rounded-lg">
+              <p class="text-sm text-gray-500">Gastos del Mes</p>
+              <p id="dash-mes-gastos" class="text-xl font-bold text-red-600">$0</p>
+            </div>
+            <div class="text-center p-3 bg-blue-50 rounded-lg">
+              <p class="text-sm text-gray-500">Balance del Mes</p>
+              <p id="dash-mes-balance" class="text-xl font-bold text-primary-600">$0</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════ INGRESOS ══════ -->
+      <section id="page-ingresos" class="page-section hidden">
+        <!-- Toolbar -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div class="flex items-center gap-2">
+            <input type="date" id="filtro-ing-fecha" class="input-field text-sm" />
+            <button onclick="Ingresos.filtrar()" class="btn-secondary text-sm"><i class="fas fa-filter mr-1"></i>Filtrar</button>
+            <button onclick="Ingresos.limpiarFiltro()" class="btn-ghost text-sm">Limpiar</button>
+          </div>
+          <button onclick="Ingresos.abrirModal()" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i>Nuevo Ingreso
+          </button>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Fecha</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Descripción</th>
+                  <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Monto</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-ingresos" class="divide-y">
+                <tr><td colspan="4" class="px-4 py-8 text-center text-gray-400">Cargando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Totals footer -->
+          <div class="bg-green-50 px-4 py-3 border-t flex justify-between items-center">
+            <span class="font-semibold text-green-800"><i class="fas fa-calculator mr-2"></i>Total Ingresos</span>
+            <span id="total-ingresos" class="text-lg font-bold text-green-700">$0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════ GASTOS ══════ -->
+      <section id="page-gastos" class="page-section hidden">
+        <!-- Toolbar -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div class="flex items-center gap-2 flex-wrap">
+            <input type="date" id="filtro-gas-fecha" class="input-field text-sm" />
+            <select id="filtro-gas-categoria" class="input-field text-sm">
+              <option value="">Todas las categorías</option>
+              <option value="pedidos_proveedores">Pedidos a Proveedores</option>
+              <option value="utiles">Compra de Útiles</option>
+              <option value="medicamentos">Medicamentos</option>
+              <option value="otros">Otros</option>
+            </select>
+            <button onclick="Gastos.filtrar()" class="btn-secondary text-sm"><i class="fas fa-filter mr-1"></i>Filtrar</button>
+            <button onclick="Gastos.limpiarFiltro()" class="btn-ghost text-sm">Limpiar</button>
+          </div>
+          <button onclick="Gastos.abrirModal()" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i>Nuevo Gasto
+          </button>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Fecha</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Descripción</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Categoría</th>
+                  <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Monto</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-gastos" class="divide-y">
+                <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">Cargando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="bg-red-50 px-4 py-3 border-t flex justify-between items-center">
+            <span class="font-semibold text-red-800"><i class="fas fa-calculator mr-2"></i>Total Gastos</span>
+            <span id="total-gastos" class="text-lg font-bold text-red-700">$0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════ PEDIDOS PENDIENTES ══════ -->
+      <section id="page-pedidos" class="page-section hidden">
+        <!-- Toolbar -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div class="flex items-center gap-2">
+            <label class="inline-flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+              <input type="checkbox" id="filtro-solo-pendientes" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500" checked />
+              Solo pendientes
+            </label>
+          </div>
+          <button onclick="Pedidos.abrirModal()" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i>Nuevo Pedido
+          </button>
+        </div>
+
+        <!-- Notificaciones de pedidos vencidos -->
+        <div id="notif-pedidos-container" class="hidden mb-4"></div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Proveedor</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Descripción</th>
+                  <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Monto</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Fecha Llegada</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Hora</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Estado</th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-pedidos" class="divide-y">
+                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">Cargando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════ REPORTES ══════ -->
+      <section id="page-reportes" class="page-section hidden">
+        <!-- Filtros de reporte -->
+        <div class="bg-white rounded-xl shadow-sm border p-5 mb-6">
+          <h3 class="font-semibold text-gray-700 mb-4"><i class="fas fa-sliders mr-2"></i>Filtros del Reporte</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Tipo de Reporte</label>
+              <select id="rep-tipo" class="input-field" onchange="Reportes.cambiarTipo()">
+                <option value="diario">Diario</option>
+                <option value="mensual">Mensual</option>
+                <option value="anual">Anual</option>
+              </select>
+            </div>
+            <div id="rep-fecha-container">
+              <label class="block text-xs text-gray-500 mb-1">Fecha</label>
+              <input type="date" id="rep-fecha" class="input-field" />
+            </div>
+            <div id="rep-mes-container" class="hidden">
+              <label class="block text-xs text-gray-500 mb-1">Mes</label>
+              <select id="rep-mes" class="input-field">
+                <option value="1">Enero</option><option value="2">Febrero</option>
+                <option value="3">Marzo</option><option value="4">Abril</option>
+                <option value="5">Mayo</option><option value="6">Junio</option>
+                <option value="7">Julio</option><option value="8">Agosto</option>
+                <option value="9">Septiembre</option><option value="10">Octubre</option>
+                <option value="11">Noviembre</option><option value="12">Diciembre</option>
+              </select>
+            </div>
+            <div id="rep-anio-container" class="hidden">
+              <label class="block text-xs text-gray-500 mb-1">Año</label>
+              <input type="number" id="rep-anio" class="input-field" min="2020" max="2040" />
+            </div>
+            <div class="flex items-end gap-2">
+              <button onclick="Reportes.generar()" class="btn-primary flex-1"><i class="fas fa-chart-bar mr-2"></i>Ver Reporte</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resultado del reporte -->
+        <div id="reporte-resultado" class="hidden">
+          <!-- Summary cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white rounded-xl shadow-sm border p-5 text-center">
+              <p class="text-sm text-gray-500">Total Ingresos</p>
+              <p id="rep-total-ingresos" class="text-2xl font-bold text-green-600 mt-1">$0</p>
+              <p id="rep-cant-ingresos" class="text-xs text-gray-400 mt-1">0 registros</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border p-5 text-center">
+              <p class="text-sm text-gray-500">Total Gastos</p>
+              <p id="rep-total-gastos" class="text-2xl font-bold text-red-600 mt-1">$0</p>
+              <p id="rep-cant-gastos" class="text-xs text-gray-400 mt-1">0 registros</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border p-5 text-center">
+              <p class="text-sm text-gray-500">Balance</p>
+              <p id="rep-balance" class="text-2xl font-bold text-primary-600 mt-1">$0</p>
+              <p class="text-xs text-gray-400 mt-1">Ingresos - Gastos</p>
+            </div>
+          </div>
+
+          <!-- Gastos por categoría -->
+          <div class="bg-white rounded-xl shadow-sm border p-5 mb-6">
+            <h3 class="font-semibold text-gray-700 mb-4">Desglose de Gastos por Categoría</h3>
+            <div id="rep-categorias" class="space-y-3">
+              <p class="text-gray-400 text-sm">Sin datos</p>
+            </div>
+          </div>
+
+          <!-- Botón exportar -->
+          <div class="text-center">
+            <button onclick="Reportes.exportarExcel()" class="btn-success text-lg px-8 py-3">
+              <i class="fas fa-file-excel mr-2"></i>Exportar a Excel
+            </button>
+          </div>
+        </div>
+
+        <!-- Historial de fechas -->
+        <div class="bg-white rounded-xl shadow-sm border p-5 mt-6">
+          <h3 class="font-semibold text-gray-700 mb-4"><i class="fas fa-clock-rotate-left mr-2"></i>Historial Disponible</h3>
+          <div id="historial-fechas" class="space-y-2">
+            <p class="text-gray-400 text-sm">Cargando historial...</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════ MODAL GENÉRICO ═══════════════════ -->
+  <div id="modal-overlay" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div id="modal-content" class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-modal">
+      <div class="flex items-center justify-between px-6 py-4 border-b">
+        <h3 id="modal-title" class="text-lg font-semibold text-gray-800">Modal</h3>
+        <button onclick="cerrarModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fas fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <div id="modal-body" class="px-6 py-4"></div>
+      <div id="modal-footer" class="px-6 py-4 border-t flex justify-end gap-3"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ NOTIFICATION POPUP ═══════════════════ -->
+  <div id="notification-popup" class="fixed inset-0 bg-black/50 z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm animate-modal text-center p-6">
+      <div class="w-16 h-16 bg-yellow-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+        <i class="fas fa-truck text-yellow-600 text-2xl"></i>
+      </div>
+      <h3 id="notif-title" class="text-lg font-semibold text-gray-800 mb-2"></h3>
+      <p id="notif-detail" class="text-sm text-gray-500 mb-2"></p>
+      <p id="notif-monto" class="text-xl font-bold text-gray-800 mb-6"></p>
+      <div class="flex gap-3">
+        <button id="notif-btn-no" class="flex-1 btn-danger py-3"><i class="fas fa-xmark mr-2"></i>No llegó</button>
+        <button id="notif-btn-si" class="flex-1 btn-success py-3"><i class="fas fa-check mr-2"></i>Sí, recibido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ TOAST ═══════════════════ -->
+  <div id="toast-container" class="fixed top-4 right-4 z-[70] space-y-2"></div>
+
+  <!-- Sidebar overlay for mobile -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+  <!-- Scripts -->
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/dashboard.js"></script>
+  <script src="/static/js/ingresos.js"></script>
+  <script src="/static/js/gastos.js"></script>
+  <script src="/static/js/pedidos.js"></script>
+  <script src="/static/js/reportes.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
